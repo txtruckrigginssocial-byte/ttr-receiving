@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TTR Receiving">
+<title>TTR Receiving</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#CC0000;--rg:rgba(204,0,0,.18);--navy:#0a0f1a;--mid:#111827;--lt:#1c2537;--bd:#263147;--wh:#fff;--mu:#8a96a8;--gr:#22c55e;--gb:rgba(34,197,94,.12);--ye:#f59e0b;--yb:rgba(245,158,11,.12);--bl:#3b82f6;--bb:rgba(59,130,246,.12)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;height:100dvh;background:var(--navy);color:var(--wh);font-family:Barlow,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── PAGES ── */
+.pg{display:none;flex-direction:column;height:100vh;height:100dvh}.pg.on{display:flex}
+
+/* ── HEADER ── */
+.hdr{background:var(--mid);border-bottom:2px solid var(--bd);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:54px}
+.hl{display:flex;align-items:center;gap:10px}
+.logo{height:30px;width:auto;max-width:115px;object-fit:contain;filter:brightness(0) invert(1)}
+.ht{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;letter-spacing:.03em}
+.hs{font-size:11px;color:var(--mu);margin-top:1px}
+.hr{display:flex;gap:6px}
+
+/* ── BANNERS ── */
+.bn{padding:7px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;font-size:12px;font-weight:600}
+.bn.warn{background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);color:var(--ye)}
+.bn.warn span{opacity:.7;font-weight:400}
+.bn.info{background:rgba(59,130,246,.08);border-bottom:1px solid rgba(59,130,246,.2);color:var(--bl)}
+.bbs{display:flex;gap:6px}
+.xb{border-radius:6px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:12px;padding:5px 10px;cursor:pointer;letter-spacing:.03em;border:1px solid}
+.xb.y{background:var(--bb);color:var(--bl);border-color:rgba(59,130,246,.3)}
+.xb.n{background:transparent;color:var(--mu);border-color:var(--bd)}
+
+/* ── IMPORT PAGE ── */
+.imp-body{flex:1;overflow-y:auto;padding:16px 14px;-webkit-overflow-scrolling:touch}
+.imp-sect{margin-bottom:22px}
+.imp-lbl{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--mu);text-transform:uppercase;margin-bottom:10px}
+.pend-card{background:var(--lt);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
+.pend-card:active{border-color:var(--red)}
+.pend-icon{font-size:26px;flex-shrink:0}
+.pend-info{flex:1;min-width:0}
+.pend-dist{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;letter-spacing:.03em}
+.pend-meta{font-size:11px;color:var(--mu);margin-top:2px}
+.pend-qty{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:22px;color:var(--gr);flex-shrink:0}
+.pend-empty{background:var(--lt);border:1px solid var(--bd);border-radius:12px;padding:22px;text-align:center;color:var(--mu);font-size:13px;line-height:1.6}
+.pend-empty .ei{font-size:36px;opacity:.25;margin-bottom:10px}
+
+/* Manual entry */
+.me-row{display:flex;gap:8px;margin-bottom:8px}
+.me-inp{flex:3;background:var(--lt);border:1px solid var(--bd);border-radius:8px;color:var(--wh);font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:16px;letter-spacing:.05em;padding:11px 12px;outline:none;-webkit-appearance:none;text-transform:uppercase}
+.me-inp::placeholder{color:var(--mu);font-weight:400;font-size:13px;text-transform:none;letter-spacing:.02em}
+.me-inp:focus{border-color:var(--red)}
+.me-qty{flex:1;background:var(--lt);border:1px solid var(--bd);border-radius:8px;color:var(--wh);font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;padding:11px 10px;outline:none;-webkit-appearance:none;text-align:center}
+.me-qty:focus{border-color:var(--red)}
+.me-add{background:var(--red);color:#fff;border:none;border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;padding:11px 16px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.me-list{background:var(--navy);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.me-item{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid var(--bd);gap:10px}
+.me-item:last-child{border-bottom:none}
+.me-sku{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;flex:1}
+.me-q{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;color:var(--gr);white-space:nowrap}
+.me-del{background:none;border:none;color:var(--mu);font-size:14px;padding:2px 6px;cursor:pointer}
+.me-del:active{color:var(--red)}
+
+/* ── SHARED ── */
+.sl{flex:1;overflow-y:auto;padding:10px 13px;-webkit-overflow-scrolling:touch}
+.sl::-webkit-scrollbar{display:none}
+.slbl{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--mu);text-transform:uppercase;padding:6px 4px 5px}
+
+/* ── REVIEW CARDS ── */
+.rc{background:var(--lt);border:1px solid var(--bd);border-radius:12px;padding:13px;margin-bottom:9px}
+.rc.unk{border-color:var(--ye);background:rgba(245,158,11,.03)}
+.rc.prob{border-color:var(--bl);background:rgba(59,130,246,.03)}
+.rt{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.pill{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;padding:3px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.pill.ok{background:var(--gb);color:var(--gr)}.pill.unk{background:var(--yb);color:var(--ye)}.pill.prob{background:var(--bb);color:var(--bl)}.pill.done{background:var(--gb);color:var(--gr)}.pill.skip{background:rgba(138,150,168,.12);color:var(--mu)}
+.cn{flex:1;min-width:0}.csk{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;letter-spacing:.05em}.cds{font-size:12px;color:var(--mu);margin-top:2px}
+.qr{display:flex;align-items:center;justify-content:space-between}
+.ql{font-size:12px;color:var(--mu);font-weight:500}.qch{font-size:13px;color:var(--gr);font-weight:600;margin-top:2px}
+.qcr{display:flex;align-items:center;background:var(--navy);border:1px solid var(--bd);border-radius:7px}
+.qb{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:var(--wh);cursor:pointer;border:none;background:none;user-select:none;-webkit-user-select:none}
+.qb:active{color:var(--red)}
+.qn{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:19px;min-width:32px;text-align:center;pointer-events:none;user-select:none}
+.pp{margin-top:11px;padding-top:11px;border-top:1px solid var(--bd)}
+.pq{font-size:13px;color:var(--bl);font-weight:600;margin-bottom:9px;line-height:1.5}
+.pb{display:flex;gap:8px}
+.pby{flex:1;background:var(--bb);color:var(--bl);border:1px solid rgba(59,130,246,.3);border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;padding:11px;cursor:pointer;text-align:center}
+.pbn{flex:1;background:transparent;color:var(--mu);border:1px solid var(--bd);border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;padding:11px;cursor:pointer;text-align:center}
+.up{margin-top:11px;padding-top:11px;border-top:1px solid var(--bd)}
+.uw{font-size:11px;color:var(--ye);font-weight:600;margin-bottom:9px}
+.ot{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+.ob{margin-bottom:10px}
+.ir{display:flex;gap:7px}
+.di{flex:1;background:var(--navy);border:1px solid var(--bd);border-radius:8px;color:var(--wh);font-family:Barlow,sans-serif;font-size:14px;padding:10px 12px;outline:none;-webkit-appearance:none}
+.di:focus{border-color:var(--ye)}.di::placeholder{color:var(--mu)}
+.badd{background:var(--yb);color:var(--ye);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;padding:10px 13px;white-space:nowrap;cursor:pointer}
+.bsk{width:100%;background:transparent;color:var(--mu);border:1px solid var(--bd);border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:14px;padding:10px;cursor:pointer;text-align:center}
+.nt{font-size:11px;color:var(--mu);margin-top:4px;line-height:1.4}
+.rs{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;margin-top:8px}
+.rs.ok{background:var(--gb)}.rs.sk{background:rgba(138,150,168,.08)}
+.rtx{font-size:13px;font-weight:600;flex:1}
+.rs.ok .rtx{color:var(--gr)}.rs.sk .rtx{color:var(--mu)}
+.bu{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;padding:5px 10px;border-radius:6px;cursor:pointer;border:none;background:rgba(255,255,255,.08);color:var(--mu)}
+
+/* ── REVIEW HEADER ── */
+.rev-meta{background:var(--mid);border-bottom:1px solid var(--bd);padding:10px 13px;flex-shrink:0}
+.rev-fields{display:flex;gap:8px;margin-bottom:8px}
+.rev-fields-2{display:flex;gap:8px}
+
+/* ── BOTTOM BAR ── */
+.bar{background:var(--mid);border-top:2px solid var(--bd);padding:10px 13px;display:flex;gap:7px;flex-shrink:0;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:10px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;letter-spacing:.04em;padding:13px 16px;cursor:pointer;border:none;user-select:none;white-space:nowrap;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.red{background:var(--red);color:#fff;flex:1}
+.btn.grn{background:var(--gr);color:var(--navy);flex:1}
+.btn.ghost{background:transparent;color:var(--mu);border:1px solid var(--bd)}
+.btn.blue{background:var(--bb);color:var(--bl);border:1px solid rgba(59,130,246,.3)}
+
+/* ── DONE PAGE ── */
+.cfm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 20px;text-align:center;overflow-y:auto;width:100%}
+.ci{width:70px;height:70px;background:var(--gb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:16px;animation:pp2 .4s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes pp2{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.ct{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:28px;margin-bottom:4px}
+.csb{font-size:14px;color:var(--mu);margin-bottom:22px}
+.cr{width:100%;background:var(--lt);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:20px;max-height:260px;overflow-y:auto}
+.rr{display:flex;align-items:center;padding:11px 13px;gap:10px;border-bottom:1px solid var(--bd)}
+.rr:last-child{border-bottom:none}
+.rio{font-size:14px;flex-shrink:0}
+.rsk{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;letter-spacing:.04em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rch{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;color:var(--gr);white-space:nowrap}
+.rch.sk{color:var(--mu)}.rch.fl{color:#f66}
+.cb2{display:flex;flex-direction:column;gap:8px;width:100%}
+
+/* ── SETUP MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;align-items:flex-end;justify-content:center}
+.mo.on{display:flex}
+.ms{background:var(--mid);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:16px 16px max(16px,env(safe-area-inset-bottom));border-top:2px solid var(--bd);animation:su .22s ease;max-height:92vh;overflow-y:auto}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mh{width:36px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 16px}
+.mt{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px;letter-spacing:.03em;margin-bottom:14px}
+.sr2{margin-bottom:13px}
+.sl2{font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.si3{width:100%;background:var(--lt);border:1px solid var(--bd);border-radius:8px;color:var(--wh);font-family:Barlow,sans-serif;font-size:14px;padding:11px 12px;outline:none;-webkit-appearance:none}
+.si3:focus{border-color:var(--red)}
+.sn{font-size:11px;color:var(--mu);margin-top:4px;line-height:1.5}
+.cst{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-bottom:13px}
+.cst.ok{background:var(--gb);color:var(--gr)}.cst.bad{background:var(--yb);color:var(--ye)}.cst.err{background:rgba(204,0,0,.1);color:#f66}
+.cd{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* ── DEBUG PANEL ── */
+.dbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:5000;flex-direction:column;font-family:monospace}
+.dbg.on{display:flex}
+.dbgh{background:#111;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;flex-shrink:0}
+.dbgh span{color:var(--ye);font-size:13px;font-weight:700;letter-spacing:.05em}
+.dbgc{flex:1;overflow-y:auto;padding:10px 12px;font-size:11px;line-height:1.6}
+.dbge{margin-bottom:10px;padding:9px 11px;border-radius:6px;border:1px solid #333;background:#0d1117;white-space:pre-wrap;word-break:break-all}
+.dbge.req{border-color:rgba(59,130,246,.5)}.dbge.res-ok{border-color:rgba(34,197,94,.5)}.dbge.res-err{border-color:rgba(204,0,0,.6)}
+.dbgl{font-size:10px;font-weight:700;letter-spacing:.08em;margin-bottom:4px}
+.dbge.req .dbgl{color:#3b82f6}.dbge.res-ok .dbgl{color:#22c55e}.dbge.res-err .dbgl{color:#f66}
+.dbgt{color:#8a96a8}
+.dbg-btn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--ye);border-radius:6px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:11px;padding:5px 9px;cursor:pointer;letter-spacing:.04em}
+.dbgx{background:none;border:1px solid #444;color:#8a96a8;border-radius:6px;font-size:12px;padding:5px 11px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:700}
+
+/* ── MISC ── */
+.fl{position:fixed;inset:0;background:var(--rg);pointer-events:none;opacity:0;z-index:500;transition:opacity .05s}.fl.on{opacity:1}
+.lo{display:none;position:fixed;inset:0;background:rgba(10,15,26,.87);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:13px}.lo.on{display:flex}
+.sp{width:42px;height:42px;border:3px solid var(--bd);border-top-color:var(--red);border-radius:50%;animation:sp2 .65s linear infinite}
+@keyframes sp2{to{transform:rotate(360deg)}}
+.lt2{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:16px;color:var(--mu);letter-spacing:.05em}
+.to{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(14px);background:var(--lt);border:1px solid var(--bd);border-radius:10px;padding:8px 15px;font-size:13px;font-weight:600;color:var(--wh);z-index:3000;opacity:0;transition:all .2s;pointer-events:none;max-width:90vw;text-align:center;white-space:nowrap}
+.to.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.to.ok{border-color:var(--gr);color:var(--gr)}.to.warn{border-color:var(--ye);color:var(--ye)}.to.err{border-color:var(--red);color:#f66}
+.pt{background:var(--navy);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.pr{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--bd);font-size:13px}
+.pr:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<div class="fl" id="fl"></div>
+<div class="to" id="to"></div>
+<div class="lo" id="lo"><div class="sp"></div><div class="lt2" id="loTxt">Submitting...</div></div>
+
+<!-- Debug Panel -->
+<div class="dbg" id="dbg">
+  <div class="dbgh">
+    <span>&#128027; TTR DEBUG LOG</span>
+    <div style="display:flex;gap:8px">
+      <button class="dbgx" onclick="dbgClear()">Clear</button>
+      <button class="dbgx" onclick="dbgClose()">&#10005; Close</button>
+    </div>
+  </div>
+  <div class="dbgc" id="dbgc"><div style="color:#555;font-size:12px;padding:10px">No entries yet.</div></div>
+</div>
+
+<!-- ══ PAGE: IMPORT ══════════════════════════════════════ -->
+<div class="pg on" id="pg-import">
+  <div class="hdr">
+    <div class="hl">
+      <img class="logo" id="logo1" src="" alt="TTR">
+      <div><div class="ht">Receiving</div><div class="hs" id="hDate"></div></div>
+    </div>
+    <div class="hr">
+      <button class="dbg-btn" onclick="dbgOpen()">&#128027; Debug</button>
+      <button class="btn ghost" style="padding:8px 12px;font-size:13px;margin-left:4px" onclick="sOpen()">&#9881; Setup</button>
+    </div>
+  </div>
+
+  <!-- No token warning -->
+  <div class="bn warn" id="demoBn">&#9888; NO TOKEN &mdash; <span>Open Setup to enter AutoLeap credentials</span></div>
+
+  <!-- Pending shipments (populated by email pipeline) -->
+  <div class="imp-body">
+    <div class="imp-sect">
+      <div class="imp-lbl">&#128230; Pending Shipments <button onclick="loadPending()" style="background:none;border:none;color:var(--mu);font-size:13px;cursor:pointer;padding:0 4px;vertical-align:middle">&#8635;</button></div>
+      <div id="pendingList">
+        <div class="pend-empty">
+          <div class="ei">&#128230;</div>
+          <div>No pending shipments</div>
+          <div style="margin-top:6px;font-size:11px;opacity:.6">Email invoices will appear here automatically once the pipeline is set up</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual entry -->
+    <div class="imp-sect">
+      <div class="imp-lbl">&#9998; Manual Entry</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Enter part numbers and quantities from a paper invoice</div>
+      <div class="me-row">
+        <input class="me-inp" id="meSkuInp" placeholder="Part number..." autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+        <input class="me-qty" id="meQtyInp" type="number" min="1" value="1" placeholder="Qty">
+        <button class="me-add" onclick="meAdd()">+ Add</button>
+      </div>
+      <div id="meList" style="display:none" class="me-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <div style="flex:1">
+          <div class="sl2" style="margin-bottom:5px">Supplier</div>
+          <select class="si3" id="meSupplier" style="padding:9px 10px;font-size:13px">
+            <option value="">Select supplier...</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <div class="sl2" style="margin-bottom:5px">Invoice #</div>
+          <input class="si3" id="meInvoice" placeholder="Optional" style="padding:9px 10px;font-size:13px">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="btn red" id="bReview" disabled onclick="goReview()">Review &#8594;</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: REVIEW ══════════════════════════════════════ -->
+<div class="pg" id="pg-rev">
+  <div class="hdr">
+    <div class="hl">
+      <img class="logo" id="logo2" src="" alt="TTR">
+      <div><div class="ht">Review</div><div class="hs" id="revSub"></div></div>
+    </div>
+  </div>
+  <div class="rev-meta">
+    <div class="rev-fields">
+      <div style="flex:1"><div class="sl2">Supplier</div><select class="si3" id="revSupplier" style="padding:8px 10px;font-size:13px"><option value="">Select supplier...</option></select></div>
+      <div style="flex:1"><div class="sl2">Invoice Date</div><input class="si3" id="revDate" type="date" style="padding:8px 10px;font-size:13px"></div>
+    </div>
+    <div class="rev-fields-2">
+      <div style="flex:1"><div class="sl2">Invoice #</div><input class="si3" id="revInvoice" placeholder="e.g. INV-12345" autocomplete="off" style="padding:8px 10px;font-size:13px"></div>
+      <div style="flex:1"><div class="sl2">Notes</div><input class="si3" id="revNotes" placeholder="Optional" autocomplete="off" style="padding:8px 10px;font-size:13px"></div>
+    </div>
+  </div>
+  <div class="sl" id="rl"></div>
+  <div class="bar">
+    <button class="btn ghost" onclick="goImport()">&#8592; Back</button>
+    <button class="btn grn" id="bSub" onclick="doSubmit()">&#10003; Submit to AutoLeap</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: DONE ══════════════════════════════════════ -->
+<div class="pg" id="pg-done" style="background:var(--navy)">
+  <div class="cfm">
+    <div class="ci">&#10003;</div>
+    <div class="ct">Receiving Complete</div>
+    <div class="csb" id="dSub"></div>
+    <div class="cr" id="dRes"></div>
+    <div class="cb2">
+      <button class="btn red" style="width:100%" onclick="newSession()">Start New Session</button>
+      <button class="btn ghost" style="width:100%" onclick="copyLog()">Copy Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETUP MODAL ══════════════════════════════════════ -->
+<div class="mo" id="mo" onclick="sOutside(event)">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt">AutoLeap Setup</div>
+
+    <div style="background:var(--lt);border:1px solid var(--bd);border-radius:8px;padding:12px 13px;margin-bottom:13px;font-size:12px;line-height:1.7;color:var(--mu)">
+      <div style="color:var(--wh);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px">&#128274; How to get a token</div>
+      <div style="margin-bottom:8px">1. Make sure AutoLeap is open and logged in on this computer</div>
+      <div style="margin-bottom:8px">2. Open Claude (claude.ai) with the Claude in Chrome extension active</div>
+      <div style="margin-bottom:10px">3. Copy and send this exact message to Claude:</div>
+      <div id="tokenPrompt" style="background:var(--navy);border:1px solid var(--bd);border-radius:6px;padding:10px 12px;font-family:monospace;font-size:11px;color:var(--wh);line-height:1.6;user-select:all;cursor:pointer" onclick="copyTokenPrompt()">
+        Use Claude in Chrome to get an AutoLeap token for TTR Receiving. Steps: 1) call tabs_context_mcp with createIfEmpty:true, 2) navigate to https://app.myautoleap.com/#/inventory/stock, 3) wait 2 seconds, 4) run this JavaScript: const alpat=document.cookie.split(';').find(c=>c.trim().startsWith('alpat=')); const token=decodeURIComponent(alpat.split('=').slice(1).join('=').trim().replace(/^"|"$/g,'')); 'TOKEN:'+token.length+':'+token — then paste the full token text (everything after TOKEN:1405:) into the TTR Receiving app Setup panel.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--mu)">&#128203; Tap the box above to copy the prompt &mdash; valid token = 1405 characters. If AutoLeap shows a 440 error later, just repeat this process.</div>
+    </div>
+
+    <div class="sr2">
+      <div class="sl2">Auth Token</div>
+      <textarea class="si3" id="cTok" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off" autocapitalize="none" style="resize:none;font-size:11px;font-family:monospace"></textarea>
+      <div class="sn">Stored on this device only.</div>
+    </div>
+    <div class="sr2">
+      <div class="sl2">Shop ID</div>
+      <input class="si3" id="cSid" placeholder="68b9b03d7ff6e27ed7dc9cae" autocomplete="off" autocapitalize="none">
+    </div>
+    <div class="sr2">
+      <div class="sl2">Company ID</div>
+      <input class="si3" id="cCid" placeholder="68b9b03d7ff6e27ed7dc9c9c" autocomplete="off" autocapitalize="none">
+    </div>
+
+    <!-- PIPELINE SECTION — wired up once email pipeline is built -->
+    <div style="border-top:1px solid var(--bd);margin-top:4px;padding-top:14px;margin-bottom:13px">
+      <div class="mt" style="font-size:15px;margin-bottom:6px">&#128231; Email Pipeline</div>
+      <div class="sn" style="margin-bottom:10px">Once set up, invoices from Meyer, Tri-State, and Earl Owen will appear automatically as pending shipments.</div>
+      <div class="sr2">
+        <div class="sl2">Apps Script URL</div>
+        <input class="si3" id="cPipeUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="none" style="font-size:11px" value="https://script.google.com/macros/s/AKfycbzHpBZL9uj-EcyyKxfpYXEaYCZx_C02ddQZAclrmJKc-YrF8F_1cV5OV6Jqxq0nP_0N-A/exec">
+        <div class="sn">Paste the deployed Apps Script URL after setup is complete.</div>
+      </div>
+    </div>
+
+    <div class="cst bad" id="cSt2"><div class="cd"></div><span id="cStTxt">Not configured</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost" style="flex:1" onclick="sTest()">Test Connection</button>
+      <button class="btn red" style="flex:1" onclick="sSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── LOGO ─────────────────────────────────────────────
+var LOGO_B64 = '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';
+(function(){
+  var src='data:image/png;base64,'+LOGO_B64;
+  document.getElementById('logo1').src=src;
+  document.getElementById('logo2').src=src;
+})();
+
+// ── CONSTANTS ─────────────────────────────────────────
+var CK  = 'ttr_cfg8';
+var SK  = 'ttr_sess8';
+var DEFAULT_SID = '68b9b03d7ff6e27ed7dc9cae';
+var DEFAULT_CID = '68b9b03d7ff6e27ed7dc9c9c';
+
+// ── STATE ─────────────────────────────────────────────
+var items    = [];   // current working items
+var slog     = [];
+var suppliers = [];
+var liveToken = null;
+var currentSessionId = null; // tracks which pending session is being processed
+
+// ── HELPERS ───────────────────────────────────────────
+function g(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escQ(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+
+// ── TOAST ─────────────────────────────────────────────
+var toTmr=null;
+function toast(msg,type){
+  var el=g('to');
+  el.textContent=msg;
+  el.className='to on'+(type?' '+type:'');
+  clearTimeout(toTmr);
+  toTmr=setTimeout(function(){el.className='to';},2600);
+}
+
+// ── FLASH ─────────────────────────────────────────────
+function flash(){
+  var el=g('fl'); el.classList.add('on');
+  setTimeout(function(){el.classList.remove('on');},100);
+}
+
+// ── LOADER ────────────────────────────────────────────
+function showLoad(msg){g('loTxt').textContent=msg||'Working...';g('lo').classList.add('on');}
+function hideLoad(){g('lo').classList.remove('on');}
+
+// ── PAGE NAV ──────────────────────────────────────────
+function showPg(id){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  g(id).classList.add('on');
+}
+function goImport(){ showPg('pg-import'); }
+function goReview(){
+  if(!items.length){toast('No items to review','warn');return;}
+  buildReviewed();
+  syncRevSupplier();
+  if(g('revDate')&&!g('revDate').value) g('revDate').value=new Date().toISOString().split('T')[0];
+  renderReview();
+  showPg('pg-rev');
+}
+
+// ── DEBUG LOG ─────────────────────────────────────────
+var dbgLog=[];
+function dbgEntry(type,label,data){
+  var entry={type:type,label:label,data:typeof data==='string'?data:JSON.stringify(data,null,2),ts:new Date().toLocaleTimeString()};
+  dbgLog.push(entry); window.__ttr_debug=dbgLog;
+  var c=g('dbgc'); if(!c) return;
+  var el=document.createElement('div');
+  el.className='dbge '+type;
+  el.innerHTML='<div class="dbgl">'+entry.ts+' — '+label+'</div><div class="dbgt">'+esc(entry.data)+'</div>';
+  if(c.firstChild&&c.firstChild.style&&c.firstChild.style.color==='#555') c.innerHTML='';
+  c.appendChild(el); c.scrollTop=c.scrollHeight;
+}
+function dbgOpen(){g('dbg').classList.add('on');}
+function dbgClose(){g('dbg').classList.remove('on');}
+function dbgClear(){dbgLog=[];window.__ttr_debug=[];g('dbgc').innerHTML='<div style="color:#555;font-size:12px;padding:10px">Cleared.</div>';}
+
+// ── TOKEN AGE ─────────────────────────────────────────
+function tokAge(){
+  var tok=liveToken||(g('cTok')&&g('cTok').value||'').trim();
+  if(!tok) return null;
+  try{
+    var p=JSON.parse(atob(tok.split('.')[1]));
+    var iat=p.iat>1e12?p.iat:p.iat*1000;
+    return Math.floor((Date.now()-iat)/60000);
+  }catch(e){return null;}
+}
+
+// ── LIVE TOKEN (bookmarklet/postMessage) ──────────────
+window.addEventListener('message',function(e){
+  if(!e.data||e.data.type!=='TTR_TOKEN') return;
+  liveToken=e.data.tok;
+  toast('Live token received \u2713','ok');
+  g('demoBn').style.display='none';
+  if(g('cTok')&&!g('cTok').value) g('cTok').value=liveToken;
+  loadSuppliers();
+});
+
+// ── CONFIG ────────────────────────────────────────────
+var PIPE_URL = 'https://script.google.com/macros/s/AKfycbzHpBZL9uj-EcyyKxfpYXEaYCZx_C02ddQZAclrmJKc-YrF8F_1cV5OV6Jqxq0nP_0N-A/exec';
+
+function cfgGet(){
+  return {
+    tok: liveToken||(g('cTok')&&g('cTok').value||'').trim(),
+    sid:(g('cSid')&&g('cSid').value||'').trim()||DEFAULT_SID,
+    cid:(g('cCid')&&g('cCid').value||'').trim()||DEFAULT_CID,
+    pipeUrl:(g('cPipeUrl')&&g('cPipeUrl').value||'').trim()||PIPE_URL
+  };
+}
+function cfgLoad(){
+  try{
+    var c=JSON.parse(localStorage.getItem(CK)||'{}');
+    if(g('cTok')) g('cTok').value=c.tok||'';
+    if(g('cSid')) g('cSid').value=c.sid||DEFAULT_SID;
+    if(g('cCid')) g('cCid').value=c.cid||DEFAULT_CID;
+    if(g('cPipeUrl')) g('cPipeUrl').value=c.pipeUrl||'';
+  }catch(e){}
+  cfgBanner();
+}
+function cfgBanner(){
+  var c=cfgGet();
+  g('demoBn').style.display=c.tok?'none':'flex';
+}
+function sSave(){
+  localStorage.setItem(CK,JSON.stringify(cfgGet()));
+  cfgBanner(); sClose();
+  toast('Saved — loading suppliers...','ok');
+  loadSuppliers().then(function(){toast('Ready \u2713','ok');});
+  if(cfgGet().pipeUrl) loadPending();
+}
+function sTest(){
+  var s=g('cSt2'),t=g('cStTxt');
+  s.className='cst bad'; t.textContent='Testing...';
+  var c=cfgGet();
+  if(!c.tok){t.textContent='No token';return;}
+  fetch('https://api.myautoleap.com/api/v1/invStocks?limit=1',{headers:mkHeaders()})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.status){
+        loadSuppliers();
+        var age=tokAge();
+        s.className='cst ok';
+        t.textContent='Connected \u2713 — '+(d.response&&d.response.metaData&&d.response.metaData.total||'?')+' items'+(age!==null?' \u00b7 token age: '+age+'m':'');
+      } else { s.className='cst err'; t.textContent='Auth failed — token may be expired'; }
+    })
+    .catch(function(e){s.className='cst err';t.textContent='Error: '+e.message;});
+}
+function sOpen(){g('mo').classList.add('on');}
+function sClose(){g('mo').classList.remove('on');}
+function sOutside(e){if(e.target===g('mo'))sClose();}
+
+// ── HEADERS ───────────────────────────────────────────
+function mkHeaders(){
+  return {'Content-Type':'application/json','authorization':cfgGet().tok,'Accept':'application/json, text/plain, */*'};
+}
+
+// ── SUPPLIERS ─────────────────────────────────────────
+async function loadSuppliers(){
+  var c=cfgGet(); if(!c.tok) return;
+  try{
+    var r=await fetch('https://api.myautoleap.com/api/v1/suppliers/getSupplier',{
+      method:'POST',headers:mkHeaders(),body:JSON.stringify({limit:100,pageNo:0})
+    });
+    var d=await r.json();
+    suppliers=Array.isArray(d.response)?d.response:(d.response&&d.response.records)||[];
+    dbgEntry('res-ok','Suppliers: '+suppliers.length,suppliers.map(function(s){return s.name;}));
+    renderSupplierDropdowns();
+  }catch(e){console.log('suppliers err',e);}
+}
+function renderSupplierDropdowns(){
+  ['meSupplier','revSupplier'].forEach(function(id){
+    var sel=g(id); if(!sel) return;
+    var cur=sel.value;
+    sel.innerHTML='<option value="">Select supplier...</option>';
+    suppliers.forEach(function(s){sel.innerHTML+='<option value="'+s._id+'">'+esc(s.name)+'</option>';});
+    if(cur) sel.value=cur;
+  });
+}
+function syncRevSupplier(){
+  var ms=g('meSupplier'),rs=g('revSupplier');
+  if(ms&&rs&&ms.value) rs.value=ms.value;
+}
+
+// ── CONFIRMED PREFIX MAP (from AutoLeap catalog analysis) ────
+// Maps manufacturer names (as they appear on invoices) to candidate
+// code transforms. Each entry is [searchTerm, transformFn[]].
+// Transforms are tried in order — first exact match wins.
+var MFR_PREFIX_MAP = {
+  'RANCH HAND': function(s){ return ['RH'+s, s]; },
+  'RANCHHAND':  function(s){ return ['RH'+s, s]; },
+  'BAK IND':    function(s){ return ['BAK'+s, s]; },
+  'BAK INDUSTRIES': function(s){ return ['BAK'+s, s]; },
+  'BLUE OX':    function(s){
+    // Blue Ox is stored 3 ways: raw BX, BLUEOX BX..., BLUEOXBX...
+    var noSpace = s.replace(/[\s\-]/g,'').toUpperCase();
+    return [s, 'BLUEOX '+s, 'BLUEOX'+noSpace,
+            'BLUEOXBX'+noSpace.replace(/^BX/,''), noSpace];
+  },
+  'BLUEOX':     function(s){
+    var noSpace = s.replace(/[\s\-]/g,'').toUpperCase();
+    return [s, 'BLUEOX '+s, 'BLUEOX'+noSpace,
+            'BLUEOXBX'+noSpace.replace(/^BX/,''), noSpace];
+  },
+  'RETRAX':     function(s){
+    // Stored as RTX<num> or RTXT<num> (T prefix stripped)
+    var noSpace = s.replace(/[\s\-]/g,'').toUpperCase();
+    return [s, 'RTX'+noSpace, 'RTXT'+noSpace,
+            'RTXT'+noSpace.replace(/^T/,''), 'RTX'+noSpace.replace(/^T/,'')];
+  },
+  'ROADMASTER': function(s){
+    return [s, 'ROADMASTER '+s, 'ROADMASTER'+s.replace(/[\s\-]/g,'')];
+  },
+  'B&W HITCHES': function(s){
+    return [s, 'B&W'+s, 'B&W'+s.replace(/[\s\-]/g,'').toUpperCase()];
+  },
+  'B&W':        function(s){
+    return [s, 'B&W'+s, 'B&W'+s.replace(/[\s\-]/g,'').toUpperCase()];
+  },
+  'CURT MFG':   function(s){ return [s, 'CUR'+s]; },
+  'CURT':       function(s){ return [s, 'CUR'+s]; },
+  'WEATHERTECH': function(s){ return [s, 'WT'+s]; },
+  'WEATHER TECH': function(s){ return [s, 'WT'+s]; },
+  'WESTIN':     function(s){ return [s, 'WES'+s]; },
+  'AMP RESEARCH': function(s){ return [s, 'AMP'+s]; },
+  'AMP':        function(s){ return [s, 'AMP'+s]; },
+  'WEATHER GUARD': function(s){ return [s, 'WG'+s]; },
+  'ROLL N LOCK': function(s){ return [s, 'RNLLG'+s, 'RNLBT'+s, 'RNL'+s]; },
+  'TRUXEDO':    function(s){ return [s, 'TRUX'+s]; },
+  'UNDERCOVER':  function(s){ return [s, 'UNDUC'+s, 'UND'+s, 'UNDFX'+s]; },
+  'ACCESS':     function(s){ return [s, 'ALC'+s]; },
+  'LUND':       function(s){ return [s, 'LUN'+s]; },
+  'PUTCO':      function(s){ return [s, 'PUT'+s]; },
+  'WARN':       function(s){ return [s, 'WARN'+s]; },
+  'RUGGED RIDGE': function(s){ return [s, 'RDY'+s]; },
+  'FABTECH':    function(s){ return [s, 'FAB'+s]; },
+  'AVS':        function(s){ return [s, 'AVS'+s]; },
+  'DRAW-TITE':  function(s){ return [s, 'DT'+s]; },
+  'HUSKY':      function(s){ return [s, 'HUS'+s]; },
+};
+
+// Build candidate SKUs to try for a given raw sku + manufacturer
+function skuCandidates(sku, manufacturer){
+  var raw = (sku||'').trim();
+  var mfr = (manufacturer||'').toUpperCase().trim();
+
+  // Check saved mapping first
+  var saved = savedMapping(raw);
+  if(saved) return [saved, raw];
+
+  // Find matching transform
+  var fn = null;
+  if(mfr){
+    // Exact match first
+    if(MFR_PREFIX_MAP[mfr]) fn = MFR_PREFIX_MAP[mfr];
+    else {
+      // Partial match
+      for(var key in MFR_PREFIX_MAP){
+        if(mfr.indexOf(key)>-1 || key.indexOf(mfr)>-1){ fn=MFR_PREFIX_MAP[key]; break; }
+      }
+    }
+  }
+
+  var candidates = fn ? fn(raw) : [raw];
+  // Dedupe while preserving order
+  var seen = {}; var out = [];
+  candidates.forEach(function(c){ var k=c.toUpperCase(); if(!seen[k]){seen[k]=true;out.push(c);} });
+  return out;
+}
+
+// ── SAVED MAPPINGS (supplier# → AutoLeap code) ───────
+var MAPPING_KEY = 'ttr_sku_map';
+function savedMapping(supplierSku){
+  try{
+    var m = JSON.parse(localStorage.getItem(MAPPING_KEY)||'{}');
+    return m[(supplierSku||'').toUpperCase()] || null;
+  }catch(e){ return null; }
+}
+function saveMapping(supplierSku, autoleapCode){
+  try{
+    var m = JSON.parse(localStorage.getItem(MAPPING_KEY)||'{}');
+    m[(supplierSku||'').toUpperCase()] = autoleapCode;
+    localStorage.setItem(MAPPING_KEY, JSON.stringify(m));
+  }catch(e){}
+}
+
+// ── API LOOKUP — tries all candidate SKUs ─────────────
+async function apiLookup(sku, manufacturer){
+  var c=cfgGet(); if(!c.tok) return null;
+
+  function parseLoc(rec){
+    var li=rec.locationInfo||{};
+    var loc={locationId:li.locationId||'',name:li.name||rec.location||''};
+    if(li.warehouseId) loc.warehouseId=li.warehouseId;
+    return loc;
+  }
+  function recToResult(rec, probMatch){
+    var r={found:true, desc:rec.title||rec.code,
+           itemId:rec.itemId||rec._id,
+           currentCount:rec.countAvailable||0,
+           location:parseLoc(rec), cost:rec.cost||rec.averageCost||0,
+           matchedCode:rec.code};
+    if(probMatch) r.probMatch=rec.code;
+    return r;
+  }
+
+  var candidates = skuCandidates(sku, manufacturer);
+  dbgEntry('req','SKU candidates for '+sku+' ('+manufacturer+')', candidates);
+
+  // Search AutoLeap for each candidate — use /items endpoint (catalog, 10k+ parts)
+  for(var ci=0; ci<candidates.length; ci++){
+    var candidate = candidates[ci];
+    try{
+      var r=await fetch('https://api.myautoleap.com/api/v1/items?limit=10&search='+encodeURIComponent(candidate)+'&type=part&activeStatus=true&stocked=all',{headers:mkHeaders()});
+      if(!r.ok){
+        if(r.status===440||r.status===401){liveToken=null;cfgBanner();throw new Error('Token expired');}
+        continue;
+      }
+      var d=await r.json();
+      var recs=(d.response&&d.response.records)||[];
+
+      // Exact code match (case-insensitive, spaces/dashes stripped)
+      var norm=function(s){return s.replace(/[\s\-]/g,'').toUpperCase();};
+      var exact=recs.find(function(rec){return norm(rec.code)===norm(candidate);});
+      if(exact){
+        // If this wasn't the first candidate, auto-save the mapping
+        if(ci>0) saveMapping(sku, exact.code);
+        return recToResult(exact, false);
+      }
+      // First result as probable match — only on first candidate pass
+      if(ci===0 && recs.length>0){
+        var probResult = recToResult(recs[0], true);
+        // Keep searching other candidates before returning prob match
+        // Store as fallback
+        if(!window.__probFallback) window.__probFallback = probResult;
+      }
+    }catch(e){
+      if(e.message.indexOf('Token expired')>-1) throw e;
+      // continue to next candidate
+    }
+  }
+
+  // Return prob fallback if we found one
+  if(window.__probFallback){
+    var fb=window.__probFallback;
+    window.__probFallback=null;
+    return fb;
+  }
+  window.__probFallback=null;
+  return null;
+}
+
+// ── PENDING SHIPMENTS (email pipeline) ────────────────
+// TODO: wire up to Apps Script once email pipeline is built
+async function loadPending(){
+  var url=cfgGet().pipeUrl; if(!url) return;
+  var el=g('pendingList');
+  el.innerHTML='<div class="pend-empty"><div class="ei" style="font-size:24px;opacity:.4">&#8635;</div><div style="font-size:12px">Checking for shipments...</div></div>';
+  try{
+    var r=await fetch(url+'?action=getPending');
+    var d=await r.json();
+    if(d.ok) renderPending(d.sessions||[]);
+    else el.innerHTML='<div class="pend-empty"><div class="ei">&#128230;</div><div>Could not load shipments</div><div style="font-size:11px;opacity:.6;margin-top:4px">'+esc(d.error||'Unknown error')+'</div></div>';
+  }catch(e){
+    el.innerHTML='<div class="pend-empty"><div class="ei">&#128230;</div><div>No pending shipments</div><div style="margin-top:6px;font-size:11px;opacity:.6">Email invoices will appear here automatically</div></div>';
+    console.log('loadPending err',e);
+  }
+}
+
+function renderPending(sessions){
+  var el=g('pendingList');
+  if(!sessions.length){
+    el.innerHTML='<div class="pend-empty"><div class="ei">&#128230;</div><div>No pending shipments</div><div style="margin-top:6px;font-size:11px;opacity:.6">Email invoices will appear here automatically once the pipeline is set up</div></div>';
+    return;
+  }
+  el.innerHTML=sessions.map(function(s){
+    return '<div class="pend-card" onclick="loadSession(\''+escQ(s.id)+'\')">'
+      +'<div class="pend-icon">&#128230;</div>'
+      +'<div class="pend-info">'
+      +'<div class="pend-dist">'+esc(s.supplierName||s.distributor)+'</div>'
+      +'<div class="pend-meta">Invoice '+esc(s.invoiceNum||'#unknown')+(s.date?' \u00b7 '+esc(s.date):'')+'</div>'
+      +'</div>'
+      +'<div class="pend-qty">'+s.itemCount+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+async function loadSession(sessionId){
+  var url=cfgGet().pipeUrl; if(!url) return;
+  showLoad('Loading shipment...');
+  try{
+    var r=await fetch(url+'?action=getSession&id='+sessionId);
+    var d=await r.json();
+    if(d.ok&&d.items){
+      currentSessionId = sessionId;
+      items=d.items.map(function(i){
+        return {sku:i.sku, altSku:i.altSku||'', desc:i.desc||i.sku, qty:i.qty||1,
+                manufacturer:i.manufacturer||'', status:'pending',itemId:null,
+                location:null,cost:0,probMatch:null,res:'pending',newDesc:''};
+      });
+      // Pre-fill supplier by name match — find the supplier ID that matches the name
+      if(d.supplierName){
+        var supName=d.supplierName.toLowerCase().trim();
+        var matched=suppliers.find(function(s){ return s.name.toLowerCase().trim()===supName; });
+        if(matched&&g('revSupplier')) g('revSupplier').value=matched._id;
+      } else if(d.supplier&&g('revSupplier')){
+        g('revSupplier').value=d.supplier;
+      }
+      if(d.invoiceNum&&g('revInvoice')) g('revInvoice').value=d.invoiceNum;
+      hideLoad();
+      await lookupAllItems();
+      goReview();
+    }
+  }catch(e){hideLoad();toast('Load failed: '+e.message,'err');}
+}
+
+// ── MANUAL ENTRY ──────────────────────────────────────
+var meItems=[]; // [{sku, qty}]
+
+function meAdd(){
+  var sku=(g('meSkuInp').value||'').trim().toUpperCase();
+  var qty=parseInt(g('meQtyInp').value)||1;
+  if(!sku){toast('Enter a part number','warn');g('meSkuInp').focus();return;}
+  // Duplicate — increment qty
+  var ex=meItems.find(function(i){return i.sku===sku;});
+  if(ex){ex.qty+=qty;toast(sku+' qty updated to '+ex.qty,'ok');}
+  else{meItems.push({sku:sku,qty:qty});flash();}
+  g('meSkuInp').value=''; g('meQtyInp').value='1';
+  g('meSkuInp').focus();
+  meRender();
+  g('bReview').disabled=meItems.length===0;
+}
+
+function meDel(sku){
+  meItems=meItems.filter(function(i){return i.sku!==sku;});
+  meRender();
+  g('bReview').disabled=meItems.length===0;
+}
+
+function meRender(){
+  var el=g('meList');
+  if(!meItems.length){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=meItems.map(function(i){
+    return '<div class="me-item">'
+      +'<span class="me-sku">'+esc(i.sku)+'</span>'
+      +'<span class="me-q">&#215;'+i.qty+'</span>'
+      +'<button class="me-del" onclick="meDel(\''+escQ(i.sku)+'\')">&#10005;</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ── LOOK UP ALL ITEMS ─────────────────────────────────
+async function goReview(){
+  if(!meItems.length&&!items.length){toast('Add items first','warn');return;}
+  // If coming from manual entry, build items from meItems
+  if(meItems.length){
+    items=meItems.map(function(i){
+      return {sku:i.sku,desc:i.sku,qty:i.qty,status:'pending',itemId:null,location:null,cost:0,probMatch:null,res:'pending',newDesc:''};
+    });
+  }
+  var c=cfgGet();
+  if(c.tok){
+    showLoad('Looking up items in AutoLeap...');
+    await lookupAllItems();
+    hideLoad();
+  } else {
+    // No token — mark all as unknown
+    items.forEach(function(i){i.status='unk';i.res='pending';});
+  }
+  syncRevSupplier();
+  if(g('revDate')&&!g('revDate').value) g('revDate').value=new Date().toISOString().split('T')[0];
+  if(g('revInvoice')&&g('meInvoice')&&g('meInvoice').value) g('revInvoice').value=g('meInvoice').value;
+  buildReviewed();
+  renderReview();
+  showPg('pg-rev');
+}
+
+async function lookupAllItems(){
+  window.__probFallback=null;
+  for(var i=0;i<items.length;i++){
+    var it=items[i];
+    window.__probFallback=null;
+    g('loTxt').textContent='Looking up '+it.sku+'... ('+(i+1)+'/'+items.length+')';
+    try{
+      var r=await apiLookup(it.sku, it.manufacturer||'');
+      if(r&&r.found&&!r.probMatch){
+        items[i].status='ok'; items[i].itemId=r.itemId;
+        items[i].desc=r.desc||it.desc; items[i].location=r.location;
+        items[i].cost=r.cost; items[i].res='update';
+        items[i].matchedCode=r.matchedCode||it.sku;
+      } else if(r&&r.found&&r.probMatch){
+        items[i].status='prob'; items[i].itemId=r.itemId;
+        items[i].desc=r.desc||it.desc; items[i].probMatch=r.probMatch;
+        items[i].location=r.location; items[i].cost=r.cost;
+        items[i].res='prob_pend'; items[i].matchedCode=r.matchedCode;
+      } else {
+        items[i].status='unk'; items[i].res='pending';
+      }
+    }catch(e){
+      if((e.message||'').indexOf('Token expired')>-1){hideLoad();toast('Token expired — get a fresh token in Setup','err');return;}
+      items[i].status='unk'; items[i].res='pending';
+    }
+  }
+}
+
+// ── BUILD REVIEWED STATE ──────────────────────────────
+function buildReviewed(){
+  // reviewed state is stored directly on items[] — already set by lookupAllItems
+}
+
+// ── REVIEW RENDER ─────────────────────────────────────
+function renderReview(){
+  var okI=[],prI=[],unI=[];
+  items.forEach(function(it,i){
+    if(it.status==='ok') okI.push(i);
+    else if(it.status==='prob') prI.push(i);
+    else unI.push(i);
+  });
+  var html='';
+  if(okI.length){html+='<div class="slbl">\u2713 In AutoLeap ('+okI.length+')</div>';okI.forEach(function(i){html+=htmlKnown(i);});}
+  if(prI.length){html+='<div class="slbl" style="margin-top:10px">~ Probable Match ('+prI.length+')</div>';prI.forEach(function(i){html+=htmlProb(i);});}
+  if(unI.length){html+='<div class="slbl" style="margin-top:10px">\u26a0 Not Found ('+unI.length+')</div>';unI.forEach(function(i){html+=htmlUnk(i);});}
+  g('rl').innerHTML=html||'<div style="color:var(--mu);text-align:center;padding:30px">No items</div>';
+  var total=items.reduce(function(s,i){return s+i.qty;},0);
+  g('revSub').textContent=items.length+' item'+(items.length!==1?'s':'')+' \u00b7 '+total+' units';
+  updSubBtn();
+}
+
+function htmlKnown(idx){
+  var it=items[idx];
+  return '<div class="rc">'
+    +'<div class="rt"><div class="pill ok">IN AUTOLEAP</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds">'+esc(it.desc)+'</div></div></div>'
+    +'<div class="qr">'
+    +'<div><div class="ql">Receiving</div><div class="qch">+'+it.qty+' unit'+(it.qty!==1?'s':'')+'</div></div>'
+    +'<div class="qcr"><button class="qb" onclick="adjQty('+idx+',-1)">&#8722;</button><div class="qn">'+it.qty+'</div><button class="qb" onclick="adjQty('+idx+',1)">+</button></div>'
+    +'</div></div>';
+}
+
+function htmlProb(idx){
+  var it=items[idx];
+  if(it.res==='update') return '<div class="rc prob">'
+    +'<div class="rt"><div class="pill done">CONFIRMED</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds">'+esc(it.desc)+'</div></div></div>'
+    +'<div class="rs ok"><span class="rtx">\u2713 Will update +'+it.qty+' for '+esc(it.sku)+'</span><button class="bu" onclick="rUndo('+idx+')">Undo</button></div>'
+    +'</div>';
+  if(it.res==='skip') return '<div class="rc prob" style="opacity:.65">'
+    +'<div class="rt"><div class="pill skip">SKIPPED</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds">Will not be added</div></div></div>'
+    +'<div class="rs sk"><span class="rtx">\u21b7 Skipped</span><button class="bu" onclick="rUndo('+idx+')">Undo</button></div>'
+    +'</div>';
+  return '<div class="rc prob">'
+    +'<div class="rt"><div class="pill prob">PROBABLE</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds" style="color:var(--bl)">\u2192 '+esc(it.probMatch)+'?</div></div></div>'
+    +'<div class="pp"><div class="pq">Scanned: <strong>'+esc(it.sku)+'</strong><br>Found as: <strong>'+esc(it.probMatch)+'</strong> \u2014 '+esc(it.desc)+'</div>'
+    +'<div class="pb"><button class="pby" onclick="rProbYes('+idx+')">\u2713 Yes, use '+esc(it.probMatch)+'</button><button class="pbn" onclick="rSkip('+idx+')">\u2715 Skip</button></div>'
+    +'</div></div>';
+}
+
+function htmlUnk(idx){
+  var it=items[idx];
+  if(it.res==='add') return '<div class="rc unk">'
+    +'<div class="rt"><div class="pill done">WILL ADD</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds">'+esc(it.newDesc)+'</div></div></div>'
+    +'<div class="rs ok"><span class="rtx">\u2713 '+esc(it.sku)+' \u00b7 "'+esc(it.newDesc)+'"</span><button class="bu" onclick="rUndo('+idx+')">Change</button></div>'
+    +'</div>';
+  if(it.res==='skip') return '<div class="rc unk" style="opacity:.65">'
+    +'<div class="rt"><div class="pill skip">SKIPPED</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds" style="color:var(--mu)">Add manually in AutoLeap</div></div></div>'
+    +'<div class="rs sk"><span class="rtx">\u21b7 Skipped</span><button class="bu" onclick="rUndo('+idx+')">Undo</button></div>'
+    +'</div>';
+  return '<div class="rc unk">'
+    +'<div class="rt"><div class="pill unk">NOT FOUND</div><div class="cn"><div class="csk">'+esc(it.sku)+'</div><div class="cds" style="color:var(--ye)">Not in AutoLeap \u00b7 '+it.qty+' unit'+(it.qty!==1?'s':'')+'</div></div></div>'
+    +'<div class="up"><div class="uw">\u26a0 How to handle:</div>'
+    +'<div class="ob"><div class="ot">Option 1 \u2014 Add to AutoLeap</div>'
+    +'<div class="ir"><input class="di" id="nd'+idx+'" placeholder="Enter description..." value="'+esc(it.newDesc||'')+'"><button class="badd" onclick="rAdd('+idx+')">+ Add</button></div>'
+    +'<div class="nt">Creates part# <strong>'+esc(it.sku)+'</strong> in AutoLeap.</div></div>'
+    +'<div class="ob" style="margin-bottom:0"><div class="ot">Option 2 \u2014 Skip</div>'
+    +'<button class="bsk" onclick="rSkip('+idx+')">\u21b7 Skip This Item</button></div>'
+    +'</div></div>';
+}
+
+// ── REVIEW ACTIONS ────────────────────────────────────
+function adjQty(idx,d){items[idx].qty=Math.max(1,items[idx].qty+d);renderReview();}
+function rProbYes(idx){
+  var it=items[idx];
+  if(it.probMatch && it.sku!==it.probMatch) saveMapping(it.sku, it.probMatch);
+  it.sku=it.probMatch; it.res='update'; renderReview();
+}
+function rAdd(idx){
+  var el=g('nd'+idx);
+  var desc=el?el.value.trim():'';
+  if(!desc){toast('Enter a description','warn');if(el)el.focus();return;}
+  items[idx].newDesc=desc; items[idx].res='add'; renderReview();
+}
+function rSkip(idx){items[idx].res='skip';renderReview();}
+function rUndo(idx){
+  items[idx].res=items[idx].status==='ok'?'update':items[idx].status==='prob'?'prob_pend':'pending';
+  items[idx].newDesc=''; renderReview();
+}
+function updSubBtn(){
+  var btn=g('bSub');
+  var p=items.filter(function(i){return i.res==='pending'||i.res==='prob_pend';}).length;
+  if(p>0){btn.textContent='\u26a0 '+p+' item'+(p>1?'s':'')+' need attention';btn.style.background='var(--ye)';btn.style.color='var(--navy)';}
+  else{btn.textContent='\u2713 Submit to AutoLeap';btn.style.background='var(--gr)';btn.style.color='var(--navy)';}
+}
+
+// ── SUBMIT ────────────────────────────────────────────
+async function doSubmit(){
+  var pend=items.filter(function(i){return i.res==='pending'||i.res==='prob_pend';});
+  if(pend.length){toast(pend.length+' item'+(pend.length>1?'s':'')+' need attention','warn');return;}
+  var age=tokAge();
+  if(age!==null&&age>240){if(!confirm('Token is '+age+'m old — may be expired. Continue?')) return;}
+  var proc=items.filter(function(i){return i.res!=='skip';});
+  showLoad('Step 1/3: Creating Purchase Order...');
+  var results=[];
+  try{
+    var poResults=await apiSubmitAsPO(proc);
+    proc.forEach(function(it,i){
+      var pr=poResults[i]||{ok:false,err:'No result'};
+      results.push({sku:it.sku,desc:it.newDesc||it.desc,qty:it.qty,ok:pr.ok,demo:pr.demo,err:pr.err});
+    });
+  }catch(e){
+    proc.forEach(function(it){results.push({sku:it.sku,desc:it.newDesc||it.desc,qty:it.qty,ok:false,err:e.message});});
+  }
+  items.filter(function(i){return i.res==='skip';}).forEach(function(it){
+    results.push({sku:it.sku,desc:it.desc,qty:it.qty,ok:null,skipped:true});
+  });
+  slog=results;
+  hideLoad();
+  // Mark session complete in Google Sheets if this came from email pipeline
+  if(currentSessionId){
+    var url=cfgGet().pipeUrl;
+    if(url){
+      fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'markComplete',id:currentSessionId})})
+        .catch(function(e){console.log('markComplete err',e);});
+    }
+    currentSessionId=null;
+  }
+  var okC=results.filter(function(r){return r.ok;}).length;
+  var skC=results.filter(function(r){return r.skipped;}).length;
+  var flC=results.filter(function(r){return r.ok===false;}).length;
+  var isDemo=results.some(function(r){return r.demo;});
+  g('dSub').textContent=okC+' updated \u00b7 '+skC+' skipped'+(flC?' \u00b7 '+flC+' failed':'')+(isDemo?' (Demo)':'');
+  g('dRes').innerHTML=results.map(function(r){
+    if(r.skipped) return '<div class="rr"><div class="rio">\u21b7</div><div class="rsk">'+esc(r.sku)+'</div><div class="rch sk">skipped</div></div>';
+    if(!r.ok) return '<div class="rr"><div class="rio">\u2717</div><div class="rsk">'+esc(r.sku)+'</div><div class="rch fl">'+esc(r.err||'failed')+'</div></div>';
+    return '<div class="rr"><div class="rio" style="color:var(--gr)">\u2713</div><div class="rsk">'+esc(r.sku)+'</div><div class="rch">+'+r.qty+'</div></div>';
+  }).join('');
+  showPg('pg-done');
+}
+
+// ── SUBMIT VIA PURCHASE ORDER ─────────────────────────
+async function apiSubmitAsPO(items){
+  var c=cfgGet();
+  if(!c.tok){await sleep(300);return items.map(function(){return {ok:true,demo:true};});}
+
+  var selEl=g('revSupplier');
+  var supplierId=selEl&&selEl.value||'';
+  var supplierName='';
+  if(selEl&&selEl.selectedIndex>0) supplierName=selEl.options[selEl.selectedIndex].text;
+  var invoiceDate=g('revDate')&&g('revDate').value||'';
+  var invoiceNumber=g('revInvoice')&&g('revInvoice').value||'';
+  var notes=g('revNotes')&&g('revNotes').value||'';
+  var h=mkHeaders();
+
+  var poItems=items.filter(function(i){return i.res==='update'&&i.itemId;}).map(function(i,idx){
+    var line={
+      code:i.matchedCode||i.sku, title:i.desc||i.sku, description:i.desc||i.sku,
+      titleFR:'', descriptionFR:'Y', type:'part',
+      isTaxable:true, taxedAmount:'', subTotal:0,
+      quantity:i.qty, cost:i.cost||0, costType:'cost',
+      price:0, priceOnPO:0, core:0, coreCost:0,
+      countAvailable:i.currentCount||0, isInventory:true, invalid:false,
+      itemId:i.itemId, poUniqueItemLineId:Date.now()+idx, _originalIndex:idx,
+      location:i.location||{locationId:'',name:''}
+    };
+    return line;
+  });
+
+  if(!poItems.length){
+    return items.map(function(i){
+      if(!i.itemId) return {ok:false,err:'Not in AutoLeap — skip and add manually'};
+      return {ok:false,err:'No valid items'};
+    });
+  }
+
+  var createBody={
+    pOStatus:'draft', pOBy:'Matthew Avery',
+    pONotes:notes||'', supplierInvoicedNo:invoiceNumber||'',
+    invoiceDate:invoiceDate||'', dueDate:'',
+    excludeCoreCostInPOs:true,
+    supplier:{supplierId:supplierId||'',name:supplierName||'',notes:''},
+    items:poItems,
+    total:{coreCost:0,parts:0,tire:0,total:0,afterTax:0,grand:0,fee:0,paid:0,unpaid:0}
+  };
+
+  dbgEntry('req','POST /purchaseOrders',createBody);
+  var r1=await fetch('https://api.myautoleap.com/api/v1/purchaseOrders',{method:'POST',headers:h,body:JSON.stringify(createBody)});
+  var t1=await r1.text();
+  dbgEntry(r1.ok?'res-ok':'res-err','POST response '+r1.status,t1.substring(0,800));
+  if(!r1.ok){
+    if(r1.status===440||r1.status===401){liveToken=null;cfgBanner();throw new Error('Token expired — get a fresh token in Setup');}
+    throw new Error('PO create '+r1.status+': '+t1.substring(0,200));
+  }
+  var d1; try{d1=JSON.parse(t1);}catch(e){throw new Error('Bad JSON: '+t1.substring(0,150));}
+  var poId=d1.response&&(d1.response._id||d1.response.id);
+  if(!poId) throw new Error('No PO ID: '+t1.substring(0,200));
+
+  g('loTxt').textContent='Step 2/3: Marking ordered...';
+  dbgEntry('req','PUT → ordered',{_id:poId,pOStatus:'ordered'});
+  var ordBody=Object.assign({},createBody,{_id:poId,pOStatus:'ordered'});
+  var r2=await fetch('https://api.myautoleap.com/api/v1/purchaseOrders/'+poId,{method:'PUT',headers:h,body:JSON.stringify(ordBody)});
+  var t2=await r2.text();
+  dbgEntry(r2.ok?'res-ok':'res-err','PUT ordered '+r2.status,t2.substring(0,400));
+  if(!r2.ok) throw new Error('PO ordered '+r2.status+': '+t2.substring(0,200));
+
+  g('loTxt').textContent='Step 3/3: Marking received...';
+  var recBody=Object.assign({},createBody,{_id:poId,pOStatus:'received',invoiceDate:invoiceDate||new Date().toISOString().split('T')[0]});
+  dbgEntry('req','PUT → received',{_id:poId,pOStatus:'received'});
+  var r3=await fetch('https://api.myautoleap.com/api/v1/purchaseOrders/'+poId,{method:'PUT',headers:h,body:JSON.stringify(recBody)});
+  var t3=await r3.text();
+  dbgEntry(r3.ok?'res-ok':'res-err','PUT received '+r3.status,t3.substring(0,400));
+  if(!r3.ok) throw new Error('PO received '+r3.status+': '+t3.substring(0,200));
+
+  return items.map(function(i){
+    if(i.res==='add') return {ok:false,err:'New item creation not yet supported'};
+    if(!i.itemId) return {ok:false,err:'Not in AutoLeap'};
+    return {ok:true,poId:poId};
+  });
+}
+
+// ── NEW SESSION ───────────────────────────────────────
+function newSession(){
+  items=[]; meItems=[]; slog=[]; currentSessionId=null;
+  if(g('meSkuInp')) g('meSkuInp').value='';
+  if(g('meQtyInp')) g('meQtyInp').value='1';
+  if(g('meInvoice')) g('meInvoice').value='';
+  meRender();
+  g('bReview').disabled=true;
+  showPg('pg-import');
+}
+
+function copyLog(){
+  var lines=['TTR Receiving Log \u2014 '+new Date().toLocaleString(),''];
+  slog.forEach(function(r){
+    var s=r.skipped?'SKIPPED':r.ok?'UPDATED':'FAILED';
+    lines.push(s+'\t'+r.sku+'\t+'+r.qty+'\t'+(r.desc||''));
+  });
+  if(navigator.clipboard) navigator.clipboard.writeText(lines.join('\n')).then(function(){toast('Log copied','ok');});
+}
+
+function copyTokenPrompt(){
+  var el=g('tokenPrompt');
+  var text=el?el.textContent.trim():'';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      toast('Prompt copied \u2713 — paste it into Claude','ok');
+    }).catch(function(){
+      toast('Select the text manually and copy','warn');
+    });
+  } else {
+    // Fallback: select the text
+    var range=document.createRange();
+    range.selectNodeContents(el);
+    var sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    toast('Text selected — now copy it','ok');
+  }
+}
+window.addEventListener('load',function(){
+  cfgLoad();
+  g('hDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  loadSuppliers();
+  loadPending(); // Always check for pending shipments on startup
+
+  // Manual entry: Enter key on SKU input
+  g('meSkuInp').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();g('meQtyInp').focus();}
+  });
+  g('meQtyInp').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();meAdd();}
+  });
+});
+</script>
+</body>
+</html>
